@@ -64,6 +64,19 @@ export type StoreOrder = {
   items?: { title: string; quantity: number; unit_price: number }[];
 };
 
+export type BlogPost = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author_name: string;
+  image_url: string | null;
+  published: boolean;
+  published_at: string | null;
+  created_at: string;
+};
+
 export type CartEntry = { productId: string; quantity: number };
 
 export const defaultSettings: StoreSettings = {

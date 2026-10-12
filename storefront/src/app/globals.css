@@ -30,6 +30,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .site-nav { display: flex; align-items: center; gap: clamp(18px, 3vw, 40px); color: #4d554e; font-size: 13px; }
 .site-nav a:hover, .text-link:hover { color: var(--brand); }
 .cart-link { min-width: 70px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 9px; font-size: 13px; font-weight: 700; }
+.admin-link { color: var(--muted); font-size: 10px; }
 .cart-count { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--brand); color: white; font-size: 11px; }
 .hero { min-height: 525px; margin: 28px clamp(16px, 4vw, 64px) 0; display: grid; grid-template-columns: 1.03fr .97fr; background: #ecefe7; }
 .hero-copy { padding: clamp(36px, 7vw, 92px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
@@ -80,6 +81,34 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .site-footer { min-height: 120px; padding: 32px clamp(22px, 7vw, 112px); display: flex; align-items: center; justify-content: space-between; gap: 18px; border-top: 1px solid var(--line); color: #646d65; font-size: 11px; }
 .site-footer > span:first-child { color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 18px; }
 .site-footer p { margin: 0; }
+.footer-links { display: flex; gap: 16px; }
+.footer-links a:hover { color: var(--brand); }
+.account-shell { min-height: 570px; display: grid; grid-template-columns: 1fr .9fr; align-items: center; gap: clamp(38px, 9vw, 120px); }
+.account-intro { max-width: 480px; }
+.account-intro .page-title { font-size: clamp(42px, 5.5vw, 67px); }
+.account-intro > p:not(.eyebrow) { max-width: 380px; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.account-form-panel { padding: clamp(20px, 4vw, 42px); border: 1px solid var(--line); background: white; }
+.account-switch { margin-bottom: 25px; display: flex; border-bottom: 1px solid var(--line); }
+.account-switch button { padding: 13px 15px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; }
+.account-switch button.selected { border-color: var(--brand); color: var(--brand); font-weight: 700; }
+.guest-note { margin: 18px 0 0; font-size: 11px; }
+.account-orders { padding: 35px 0; }
+.account-orders .page-title { margin-bottom: 20px; font-size: 30px; }
+.journal-heading { max-width: 680px; margin: 24px auto 55px; text-align: center; }
+.journal-heading .page-title { font-size: clamp(46px, 7vw, 76px); }
+.journal-heading > p:last-child, .article-heading > p:last-child { color: var(--muted); font-size: 14px; line-height: 1.8; }
+.journal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 20px; }
+.journal-card { min-width: 0; }
+.journal-image { aspect-ratio: 1.35; display: block; margin-bottom: 19px; background: linear-gradient(140deg, #d6ded4, #dccdb7); background-position: center; background-size: cover; }
+.journal-card:nth-child(3n + 2) .journal-image { background-image: linear-gradient(140deg, #cad7ce, #c2c9b7); }
+.journal-card .eyebrow { margin-bottom: 9px; font-size: 9px; }
+.journal-card h2 { margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: 25px; font-weight: 400; line-height: 1.17; }
+.journal-card > p:not(.eyebrow) { min-height: 44px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.article-page { max-width: 900px; }
+.article-heading { max-width: 720px; margin: 35px auto; text-align: center; }
+.article-heading .page-title { font-size: clamp(39px, 6vw, 68px); }
+.article-image { min-height: 380px; margin: 32px 0; background: #e6e6dc center / cover no-repeat; }
+.article-content { max-width: 680px; margin: 35px auto 55px; color: #485249; font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.95; white-space: pre-wrap; }
 .setup-banner, .error-banner { padding: 11px 18px; background: #fff6df; color: #694d13; font-size: 12px; text-align: center; }
 .setup-banner code { font-size: 11px; }
 .error-banner { background: #fff0ed; color: #963c2d; }
@@ -156,7 +185,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .wordmark { max-width: 145px; font-size: 17px; }
   .wordmark-image { width: 125px; height: 38px; }
   .site-nav { gap: 13px; font-size: 11px; }
-  .site-nav a:nth-child(2) { display: none; }
+  .site-nav a:nth-child(2), .site-nav a:nth-child(3) { display: none; }
+  .admin-link { display: none; }
   .cart-link { min-width: auto; font-size: 11px; }
   .hero { margin: 13px 10px 0; grid-template-columns: 1fr; }
   .hero-copy { padding: 38px 27px; }
@@ -170,6 +200,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .product-name { font-size: 15px; }
   .product-prices { font-size: 12px; }
   .site-footer { align-items: flex-start; flex-direction: column; }
+  .account-shell { min-height: auto; padding: 15px 0 32px; grid-template-columns: 1fr; gap: 25px; }
+  .account-intro .page-title { font-size: 43px; }
+  .journal-grid { grid-template-columns: 1fr; gap: 30px; }
+  .journal-heading { margin: 20px auto 38px; }
+  .journal-image { aspect-ratio: 1.35; }
+  .article-image { min-height: 245px; }
   .product-detail { grid-template-columns: 1fr; }
   .detail-image { min-height: 380px; }
   .content-page { padding: 34px 17px 58px; }

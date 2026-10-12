@@ -14,8 +14,9 @@ import {
   type StoreSettings,
 } from "@/lib/store";
 import { getSupabase } from "@/lib/supabase";
+import { BlogManager } from "@/components/blog-manager";
 
-type Tab = "Products" | "Collections" | "Discounts" | "Orders" | "Store design";
+type Tab = "Products" | "Collections" | "Discounts" | "Orders" | "Blog" | "Store design";
 type ProductForm = {
   id?: string;
   title: string;
@@ -59,7 +60,7 @@ const emptyDiscount: DiscountForm = {
   code: "", kind: "percentage", amount: "", minimum_order: "0",
   usage_limit: "", used_count: 0, starts_at: "", ends_at: "", active: true,
 };
-const tabs: Tab[] = ["Products", "Collections", "Discounts", "Orders", "Store design"];
+const tabs: Tab[] = ["Products", "Collections", "Discounts", "Orders", "Blog", "Store design"];
 
 function textValue(form: FormData, name: string) {
   return String(form.get(name) ?? "").trim();
@@ -529,6 +530,7 @@ export function AdminPanel() {
                   </tbody></table></div>
                 </>
               )}
+              {tab === "Blog" && <BlogManager />}
               {tab === "Store design" && (
                 <>
                   <div className="admin-section-heading"><h2>Storefront content and settings</h2></div>

@@ -172,6 +172,10 @@ export function Storefront() {
       <footer className="site-footer">
         <span>{settings.store_name}</span>
         <p>{settings.tagline}</p>
+        <nav className="footer-links" aria-label="Footer navigation">
+          <Link href="/blog">Journal</Link>
+          <Link href="/account">My account</Link>
+        </nav>
         <span>{settings.contact_email}</span>
       </footer>
     </main>

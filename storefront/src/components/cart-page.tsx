@@ -116,9 +116,15 @@ export function CartPage() {
     setError("");
     setSubmitting(true);
     try {
+      const { data: sessionData, error: sessionError } = await getSupabase().auth.getSession();
+      if (sessionError) throw new Error(`Could not verify your account session: ${sessionError.message}`);
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (sessionData.session?.access_token) {
+        headers.Authorization = `Bearer ${sessionData.session.access_token}`;
+      }
       const response = await fetch("/api/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           customer: fields,
           items: cart,

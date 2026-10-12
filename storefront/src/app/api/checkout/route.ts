@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { getServiceSupabase } from "@/lib/server-supabase";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -59,11 +60,32 @@ export async function POST(request: Request) {
   }
 
   try {
+    const authorization = request.headers.get("authorization");
+    let customerId: string | null = null;
+    let verifiedCustomerEmail: string | null = null;
+    if (authorization) {
+      const token = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!token || !url || !anonKey) {
+        return NextResponse.json({ error: "Customer session could not be verified." }, { status: 401 });
+      }
+      const authClient = createClient(url, anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      const { data, error } = await authClient.auth.getUser(token);
+      if (error || !data.user) {
+        return NextResponse.json({ error: "Your customer session has expired. Please sign in again." }, { status: 401 });
+      }
+      customerId = data.user.id;
+      verifiedCustomerEmail = data.user.email ?? null;
+    }
+
     const supabase = getServiceSupabase();
     const { data, error } = await supabase.rpc("place_store_order", {
       p_customer: {
         name: body.customer.name,
-        email: body.customer.email ?? "",
+        email: verifiedCustomerEmail ?? body.customer.email ?? "",
         phone: body.customer.phone,
         address: body.customer.address,
         city: body.customer.city,
@@ -75,6 +97,7 @@ export async function POST(request: Request) {
       })),
       p_discount_code: body.discountCode ?? "",
       p_payment_method: body.paymentMethod,
+      p_customer_id: customerId,
     });
 
     if (error) {

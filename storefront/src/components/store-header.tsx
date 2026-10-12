@@ -54,11 +54,13 @@ export function StoreHeader() {
         <nav className="site-nav" aria-label="Main navigation">
           <Link href="/">Shop</Link>
           <Link href="/#collections">Collections</Link>
-          <Link href="/admin">Manage store</Link>
+          <Link href="/blog">Journal</Link>
+          <Link href="/account">Account</Link>
         </nav>
         <Link className="cart-link" href="/cart">
           Bag <span className="cart-count">{cartCount}</span>
         </Link>
+        <Link className="admin-link" href="/admin">Manage store</Link>
       </header>
     </>
   );

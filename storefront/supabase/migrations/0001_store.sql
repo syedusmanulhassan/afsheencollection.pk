@@ -74,6 +74,7 @@ on conflict (id) do nothing;
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   order_number bigint generated always as identity unique,
+  customer_id uuid references auth.users(id) on delete set null,
   customer_name text not null,
   email text not null default '',
   phone text not null,
@@ -92,6 +93,20 @@ create table if not exists public.orders (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.blog_posts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  slug text not null unique,
+  excerpt text not null default '',
+  content text not null default '',
+  author_name text not null default 'Afsheen Collection',
+  image_url text,
+  published boolean not null default false,
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.order_items (
   id uuid primary key default gen_random_uuid(),
   order_id uuid not null references public.orders(id) on delete cascade,
@@ -108,6 +123,10 @@ create index if not exists collections_published_title_idx
   on public.collections (published, title);
 create index if not exists orders_created_idx
   on public.orders (created_at desc);
+create index if not exists blog_posts_published_idx
+  on public.blog_posts (published, published_at desc);
+create index if not exists orders_customer_created_idx
+  on public.orders (customer_id, created_at desc);
 
 create or replace function public.is_store_admin()
 returns boolean
@@ -126,6 +145,7 @@ alter table public.discount_codes enable row level security;
 alter table public.store_settings enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
+alter table public.blog_posts enable row level security;
 
 grant usage on schema public to anon, authenticated;
 grant select on public.collections, public.products, public.product_collections, public.store_settings
@@ -135,6 +155,8 @@ grant insert, update, delete on public.collections, public.products,
   to authenticated;
 grant select on public.discount_codes, public.orders, public.order_items
   to authenticated;
+grant select on public.blog_posts to anon, authenticated;
+grant insert, update, delete on public.blog_posts to authenticated;
 
 create policy "Public can read published collections"
   on public.collections for select
@@ -180,12 +202,32 @@ create policy "Admins manage store settings"
   using ((select public.is_store_admin()))
   with check ((select public.is_store_admin()));
 
+create policy "Public can read published blog posts"
+  on public.blog_posts for select
+  using (published or (select public.is_store_admin()));
+create policy "Admins manage blog posts"
+  on public.blog_posts for all
+  using ((select public.is_store_admin()))
+  with check ((select public.is_store_admin()));
+
 create policy "Admins read orders"
   on public.orders for select
   using ((select public.is_store_admin()));
 create policy "Admins read order items"
   on public.order_items for select
   using ((select public.is_store_admin()));
+create policy "Customers can read their own orders"
+  on public.orders for select to authenticated
+  using (customer_id = (select auth.uid()));
+create policy "Customers can read their own order items"
+  on public.order_items for select to authenticated
+  using (
+    exists (
+      select 1 from public.orders o
+      where o.id = order_items.order_id
+        and o.customer_id = (select auth.uid())
+    )
+  );
 
 insert into storage.buckets (id, name, public)
 values ('store-media', 'store-media', true)
@@ -221,7 +263,8 @@ create or replace function public.place_store_order(
   p_customer jsonb,
   p_items jsonb,
   p_discount_code text,
-  p_payment_method text
+  p_payment_method text,
+  p_customer_id uuid default null
 )
 returns jsonb
 language plpgsql
@@ -246,6 +289,12 @@ begin
 
   if p_payment_method not in ('cod', 'bank_transfer') then
     raise exception 'Unsupported payment method';
+  end if;
+
+  if p_customer_id is not null and not exists (
+    select 1 from auth.users where id = p_customer_id
+  ) then
+    raise exception 'Customer account not found';
   end if;
 
   for item in
@@ -293,10 +342,11 @@ begin
   final_total := subtotal_amount - discount_amount;
 
   insert into public.orders (
-    customer_name, email, phone, address, city, payment_method,
+    customer_id, customer_name, email, phone, address, city, payment_method,
     subtotal, discount, total, discount_code, customer_note
   )
   values (
+    p_customer_id,
     trim(p_customer ->> 'name'),
     coalesce(trim(p_customer ->> 'email'), ''),
     trim(p_customer ->> 'phone'),
@@ -347,9 +397,9 @@ begin
 end;
 $$;
 
-revoke all on function public.place_store_order(jsonb, jsonb, text, text)
+revoke all on function public.place_store_order(jsonb, jsonb, text, text, uuid)
   from public, anon, authenticated;
-grant execute on function public.place_store_order(jsonb, jsonb, text, text)
+grant execute on function public.place_store_order(jsonb, jsonb, text, text, uuid)
   to service_role;
 
 create or replace function public.update_store_order(

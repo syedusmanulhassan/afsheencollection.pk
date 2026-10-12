@@ -8,6 +8,9 @@ outside this public repository and is not redistributed by this project.
 
 - Public product and collection pages, product images, cart, discount codes, and
   mobile-friendly storefront content.
+- Customer sign-up/sign-in at `/account`, with account order history, plus guest
+  checkout.
+- A public journal at `/blog`, with draft and publish controls in the CMS.
 - Admin-managed products, collections, stock, images, discount codes, orders,
   payment status, and homepage/store settings at `/admin`.
 - Cash on Delivery and manual bank transfer. Online card payments are not
@@ -20,8 +23,10 @@ outside this public repository and is not redistributed by this project.
 
 1. Create a Supabase project and run
    `supabase/migrations/0001_store.sql` in its SQL Editor.
-2. In Supabase Auth, create your administrator user and disable public sign-ups.
-   In the SQL Editor, assign the admin role to that account:
+2. Enable customer sign-ups and email confirmation in Supabase Auth. Configure
+   the site's production and local URLs in the Auth redirect URL settings.
+   Create your administrator user separately, then assign its admin role in the
+   SQL Editor:
 
    ```sql
    update auth.users
@@ -51,7 +56,10 @@ with `NEXT_PUBLIC_`.
 4. Deploy. Add `afsheencollection.pk` in Vercel's domain settings and follow its
    DNS instructions at the domain registrar.
 5. Sign in at `/admin`, add products and collections, set bank transfer
-   instructions and contact information, then publish the products.
+   instructions and contact information, then publish the products. Use the
+   **Blog** tab to draft and publish journal posts. Customers can register,
+   sign in, and view account-linked orders at `/account`; guest checkout remains
+   available.
 
 The Supabase migration must be applied before deployment can load store data or
 accept orders. GitHub Pages alone cannot run the database-backed CMS or checkout.
