@@ -79,12 +79,17 @@ export function Storefront() {
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">{settings.store_name}</p>
+          <p className="eyebrow">A considered edit from {settings.store_name}</p>
           <h1>{settings.hero_title}</h1>
           <p className="hero-description">{settings.hero_text}</p>
-          <a className="button button-primary" href="#products">
-            Explore the collection <span aria-hidden="true">↗</span>
-          </a>
+          <div className="hero-actions">
+            <a className="button button-primary" href="#products">
+              Shop the collection <span aria-hidden="true">↗</span>
+            </a>
+            <a className="hero-secondary-link" href="#collections">
+              Browse our edits
+            </a>
+          </div>
           <p className="hero-caption">{settings.delivery_note}</p>
         </div>
         <div
@@ -99,11 +104,30 @@ export function Storefront() {
         >
           {!settings.hero_image_url && (
             <div className="hero-art-note">
-              <span>CURATED FOR YOU</span>
-              <strong>Everyday finds.<br />Made to feel special.</strong>
-              <i aria-hidden="true">✳</i>
+              <span>THE AFSHEEN EDIT</span>
+              <strong>Little details.<br />A lovely difference.</strong>
+              <i aria-hidden="true">A</i>
+              <small>Thoughtfully chosen for you</small>
             </div>
           )}
+          {settings.hero_image_url && (
+            <span className="hero-image-caption">{settings.store_name}</span>
+          )}
+        </div>
+      </section>
+
+      <section className="service-strip" aria-label="Shopping details">
+        <div>
+          <span className="service-icon" aria-hidden="true">01</span>
+          <span><strong>Made for everyday</strong><small>Thoughtful finds, picked with care</small></span>
+        </div>
+        <div>
+          <span className="service-icon" aria-hidden="true">02</span>
+          <span><strong>Cash on delivery</strong><small>Pay when your order arrives</small></span>
+        </div>
+        <div>
+          <span className="service-icon" aria-hidden="true">03</span>
+          <span><strong>Across Pakistan</strong><small>{settings.delivery_note}</small></span>
         </div>
       </section>
 
@@ -111,9 +135,10 @@ export function Storefront() {
         <section className="section-block" id="collections">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Browse by edit</p>
-              <h2>Collections</h2>
+              <p className="eyebrow">Find your kind of lovely</p>
+              <h2>Shop by collection</h2>
             </div>
+            <span className="muted">Thoughtfully gathered, just for you</span>
           </div>
           <div className="collection-grid">
             {collections.map((collection) => (
@@ -132,7 +157,10 @@ export function Storefront() {
                   role={collection.image_url ? "img" : undefined}
                   aria-label={collection.image_url ? collection.title : undefined}
                 />
-                <span>{collection.title}</span>
+                <span className="collection-card-copy">
+                  <strong>{collection.title}</strong>
+                  {collection.description && <small>{collection.description}</small>}
+                </span>
                 <span className="arrow" aria-hidden="true">↗</span>
               </Link>
             ))}
@@ -143,10 +171,12 @@ export function Storefront() {
       <section className="section-block" id="products">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">The good things</p>
-            <h2>Latest arrivals</h2>
+            <p className="eyebrow">A fresh little something</p>
+            <h2>New and noteworthy</h2>
           </div>
-          <span className="muted">{products.length} products</span>
+          {products.length > 0 && (
+            <span className="muted">{products.length} thoughtful finds</span>
+          )}
         </div>
         {loading ? (
           <p className="empty-state">Loading the collection…</p>
@@ -162,21 +192,59 @@ export function Storefront() {
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <h3>Your storefront is ready for its first products.</h3>
-            <p>Add products and collections from the store CMS.</p>
-            <Link className="text-link" href="/admin">Open the CMS <span aria-hidden="true">↗</span></Link>
+          <div className="catalog-empty">
+            <div className="catalog-empty-mark" aria-hidden="true">A</div>
+            <div>
+              <p className="eyebrow">The first edit is yours</p>
+              <h3>Something lovely is on its way.</h3>
+              <p>We’re getting the shelves ready. Check back soon for our first collection.</p>
+            </div>
           </div>
         )}
       </section>
+
+      <section className="editorial-banner">
+        <div>
+          <p className="eyebrow">A little more about us</p>
+          <h2>Good things, chosen with you in mind.</h2>
+          <p>{settings.tagline}</p>
+          <Link className="button button-outline" href="/blog">
+            Visit our journal <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+        <div className="editorial-monogram" aria-hidden="true">
+          <span>A</span>
+          <i>AFSHEEN COLLECTION</i>
+        </div>
+      </section>
+
       <footer className="site-footer">
-        <span>{settings.store_name}</span>
-        <p>{settings.tagline}</p>
-        <nav className="footer-links" aria-label="Footer navigation">
+        <div className="footer-brand">
+          <Link className="footer-wordmark" href="/">{settings.store_name}</Link>
+          <p>{settings.tagline}</p>
+        </div>
+        <nav className="footer-links" aria-label="Explore">
+          <strong>Explore</strong>
+          <Link href="/">Shop all</Link>
+          <Link href="/#collections">Collections</Link>
           <Link href="/blog">Journal</Link>
-          <Link href="/account">My account</Link>
         </nav>
-        <span>{settings.contact_email}</span>
+        <nav className="footer-links" aria-label="Your account">
+          <strong>Your account</strong>
+          <Link href="/account">My account</Link>
+          <Link href="/cart">Shopping bag</Link>
+        </nav>
+        {(settings.contact_email || settings.contact_phone) && (
+          <div className="footer-contact">
+            <strong>We’re here to help</strong>
+            {settings.contact_email && <a href={`mailto:${settings.contact_email}`}>{settings.contact_email}</a>}
+            {settings.contact_phone && <a href={`tel:${settings.contact_phone}`}>{settings.contact_phone}</a>}
+          </div>
+        )}
+        <div className="footer-bottom">
+          <span>© {settings.store_name}</span>
+          <span>Thoughtfully yours.</span>
+        </div>
       </footer>
     </main>
   );
